@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campus-library-mcp-server"
+version = "0.1.0"
+description = "Campus Library MCP Server built with the official Python MCP SDK"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]==2.0.0"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
