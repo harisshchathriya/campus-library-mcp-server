@@ -2,6 +2,8 @@
 
 from mcp.server.mcpserver import MCPServer
 
+from library_mcp.database import search_books
+
 
 app = MCPServer(
     name="Campus Library MCP Server",
@@ -15,6 +17,27 @@ def health_check() -> dict[str, str]:
     return {
         "status": "ok",
         "service": "Campus Library MCP Server",
+    }
+
+
+@app.tool(
+    description=(
+        "Search the library catalog by a required text query. Searches book titles, "
+        "authors, and categories and returns matching catalog details."
+    )
+)
+def search_book(query: str) -> dict[str, object]:
+    """Search the catalog using a normalized, non-empty query."""
+    normalized_query = query.strip()
+    if not normalized_query:
+        raise ValueError("query must not be empty or whitespace-only")
+
+    books = search_books(normalized_query)
+    return {
+        "success": True,
+        "query": normalized_query,
+        "count": len(books),
+        "books": books,
     }
 
 

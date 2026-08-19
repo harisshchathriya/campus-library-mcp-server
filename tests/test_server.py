@@ -28,7 +28,9 @@ class ServerTests(unittest.TestCase):
 
     def test_health_check_is_registered(self) -> None:
         tools = asyncio.run(app.list_tools())
-        self.assertEqual([tool.name for tool in tools], ["health_check"])
+        self.assertEqual(
+            [tool.name for tool in tools], ["health_check", "search_book"]
+        )
 
     def test_stdio_client_discovers_and_calls_health_check(self) -> None:
         """Verify initialization, discovery, and invocation over stdio."""
@@ -47,7 +49,10 @@ class ServerTests(unittest.TestCase):
                     result = await session.call_tool("health_check")
 
                     self.assertEqual(initialized.server_info.name, "Campus Library MCP Server")
-                    self.assertEqual([tool.name for tool in tools.tools], ["health_check"])
+                    self.assertEqual(
+                        [tool.name for tool in tools.tools],
+                        ["health_check", "search_book"],
+                    )
                     self.assertEqual(
                         result.structured_content,
                         {"status": "ok", "service": "Campus Library MCP Server"},

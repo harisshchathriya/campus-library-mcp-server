@@ -49,3 +49,23 @@ def initialize_database() -> None:
         )
 
         connection.commit()
+
+
+def search_books(query: str) -> list[dict[str, int | str]]:
+    """Return books whose title, author, or category contains ``query``."""
+    search_pattern = f"%{query}%"
+
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, title, author, category, total_copies, available_copies
+            FROM books
+            WHERE LOWER(title) LIKE LOWER(?)
+               OR LOWER(author) LIKE LOWER(?)
+               OR LOWER(category) LIKE LOWER(?)
+            ORDER BY id
+            """,
+            (search_pattern, search_pattern, search_pattern),
+        ).fetchall()
+
+    return [dict(row) for row in rows]
