@@ -2,7 +2,7 @@
 
 from mcp.server.mcpserver import MCPServer
 
-from library_mcp.database import search_books
+from library_mcp.database import get_book_availability, search_books
 
 
 app = MCPServer(
@@ -38,6 +38,45 @@ def search_book(query: str) -> dict[str, object]:
         "query": normalized_query,
         "count": len(books),
         "books": books,
+    }
+
+
+@app.tool(
+    description=(
+        "Check the current availability of one specific library book using its "
+        "book_id. This reports copy counts only; it does not reserve or modify "
+        "the book."
+    )
+)
+def check_availability(book_id: int) -> dict[str, bool | int | str]:
+    """Return current copy availability for a valid positive book ID."""
+    if isinstance(book_id, bool) or not isinstance(book_id, int) or book_id <= 0:
+        raise ValueError("book_id must be a positive integer")
+
+    book = get_book_availability(book_id)
+    if book is None:
+        return {
+            "success": False,
+            "book_id": book_id,
+            "error": "Book not found",
+        }
+
+    available_copies = book["available_copies"]
+    total_copies = book["total_copies"]
+    title = book["title"]
+    stored_book_id = book["id"]
+    assert isinstance(available_copies, int)
+    assert isinstance(total_copies, int)
+    assert isinstance(title, str)
+    assert isinstance(stored_book_id, int)
+
+    return {
+        "success": True,
+        "book_id": stored_book_id,
+        "title": title,
+        "available": available_copies > 0,
+        "available_copies": available_copies,
+        "total_copies": total_copies,
     }
 
 

@@ -69,3 +69,18 @@ def search_books(query: str) -> list[dict[str, int | str]]:
         ).fetchall()
 
     return [dict(row) for row in rows]
+
+
+def get_book_availability(book_id: int) -> dict[str, int | str] | None:
+    """Return availability details for one book, or ``None`` when absent."""
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT id, title, total_copies, available_copies
+            FROM books
+            WHERE id = ?
+            """,
+            (book_id,),
+        ).fetchone()
+
+    return dict(row) if row is not None else None

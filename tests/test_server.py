@@ -29,7 +29,8 @@ class ServerTests(unittest.TestCase):
     def test_health_check_is_registered(self) -> None:
         tools = asyncio.run(app.list_tools())
         self.assertEqual(
-            [tool.name for tool in tools], ["health_check", "search_book"]
+            [tool.name for tool in tools],
+            ["health_check", "search_book", "check_availability"],
         )
 
     def test_stdio_client_discovers_and_calls_health_check(self) -> None:
@@ -51,7 +52,7 @@ class ServerTests(unittest.TestCase):
                     self.assertEqual(initialized.server_info.name, "Campus Library MCP Server")
                     self.assertEqual(
                         [tool.name for tool in tools.tools],
-                        ["health_check", "search_book"],
+                        ["health_check", "search_book", "check_availability"],
                     )
                     self.assertEqual(
                         result.structured_content,
